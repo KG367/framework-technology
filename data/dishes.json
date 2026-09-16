@@ -1,0 +1,78 @@
+[
+  {
+    "name": "Омлет с сыром",
+    "slot": "завтрак",
+    "minutes": 10,
+    "kcal": 320,
+    "ingredients": [
+      {"name": "яйца", "amount": "3 шт"},
+      {"name": "сыр", "amount": "50 г"},
+      {"name": "молоко", "amount": "50 мл"}
+    ]
+  },
+  {
+    "name": "Овсяная каша",
+    "slot": "завтрак",
+    "minutes": 15,
+    "kcal": 280,
+    "ingredients": [
+      {"name": "овсянка", "amount": "80 г"},
+      {"name": "молоко", "amount": "200 мл"},
+      {"name": "мёд", "amount": "1 ст. л."}
+    ]
+  },
+  {
+    "name": "Тост с авокадо",
+    "slot": "завтрак",
+    "minutes": 7,
+    "kcal": 250,
+    "ingredients": [
+      {"name": "хлеб", "amount": "2 ломтика"},
+      {"name": "авокадо", "amount": "1 шт"}
+    ]
+  },
+  {
+    "name": "Паста с томатами",
+    "slot": "обед",
+    "minutes": 20,
+    "kcal": 520,
+    "ingredients": [
+      {"name": "паста", "amount": "200 г"},
+      {"name": "томаты", "amount": "300 г"},
+      {"name": "чеснок", "amount": "2 зубчика"}
+    ]
+  },
+  {
+    "name": "Куриный суп",
+    "slot": "обед",
+    "minutes": 60,
+    "kcal": 350,
+    "ingredients": [
+      {"name": "курица", "amount": "400 г"},
+      {"name": "картофель", "amount": "300 г"},
+      {"name": "морковь", "amount": "1 шт"}
+    ]
+  },
+  {
+    "name": "Гречка с котлетой",
+    "slot": "ужин",
+    "minutes": 30,
+    "kcal": 480,
+    "ingredients": [
+      {"name": "гречка", "amount": "150 г"},
+      {"name": "фарш", "amount": "300 г"},
+      {"name": "лук", "amount": "1 шт"}
+    ]
+  },
+  {
+    "name": "Салат с тунцом",
+    "slot": "ужин",
+    "minutes": 15,
+    "kcal": 260,
+    "ingredients": [
+      {"name": "тунец", "amount": "1 банка"},
+      {"name": "салат", "amount": "100 г"},
+      {"name": "яйца", "amount": "2 шт"}
+    ]
+  }
+]
