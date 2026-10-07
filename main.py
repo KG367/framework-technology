@@ -1,9 +1,10 @@
 """Точка входа: интерактивное меню системы планирования питания."""
 
-from typing import Any, Dict, List
+from typing import Any, Callable, Dict, List, Tuple
 
 from dishes import filter_dishes, find_by_name, load_dishes
 from planner import (
+    MEAL_SLOTS,
     add_meal,
     build_shopping_list,
     load_plan,
@@ -11,8 +12,34 @@ from planner import (
     save_plan,
     total_calories,
 )
+from user import (
+    UserProfile,
+    add_restriction,
+    filter_by_restrictions,
+    load_user,
+    remove_restriction,
+    save_user,
+    set_budget,
+    set_name,
+    set_target_kcal,
+)
 from utils import ask_int, format_date, parse_date
 
+MENU: Tuple[Tuple[str, str], ...] = (
+    ("1", "Показать каталог блюд"),
+    ("2", "Найти блюдо по названию"),
+    ("3", "Подобрать блюдо по времени"),
+    ("4", "Добавить блюдо в план"),
+    ("5", "Удалить блюдо из плана"),
+    ("6", "Показать план"),
+    ("7", "Список покупок"),
+    ("8", "Статистика"),
+    ("9", "Показать профиль"),
+    ("10", "Настроить профиль"),
+    ("11", "Ограничения питания"),
+    ("12", "Подобрать блюда без ограничений"),
+    ("0", "Выход"),
+)
 
 def show_dishes(dishes: List[Dict[str, Any]]) -> None:
     """Печатает каталог блюд."""
@@ -37,6 +64,17 @@ def show_plan(plan: List[Dict[str, Any]]) -> None:
             f"{meal['dish']} x{meal['portions']}"
         )
 
+def show_profile(user: UserProfile) -> None:
+    """Печатает профиль пользователя."""
+    print("\n--- Профиль ---")
+    print(f"  Имя: {user['name']}")
+    print(f"  Цель по калориям: {user['target_kcal']} ккал/день")
+    print(f"  Бюджет: {user['budget']} руб/неделя")
+    restrictions = user["restrictions"]
+    if restrictions:
+        print(f"  Ограничения: {', '.join(restrictions)}")
+    else:
+        print("  Ограничения: нет")
 
 def handle_find(dishes: List[Dict[str, Any]]) -> None:
     """Обрабатывает поиск блюда по названию."""
@@ -130,42 +168,145 @@ def handle_shopping(
 def handle_stats(
     dishes: List[Dict[str, Any]],
     plan: List[Dict[str, Any]],
+    user: UserProfile,
 ) -> None:
-    """Печатает статистику по плану."""
+    """Печатает статистику по плану и сравнивает с целью."""
+    total = total_calories(plan, dishes)
+    target = user["target_kcal"]
     print(f"\nБлюд в плане: {len(plan)}")
-    print(f"Суммарная калорийность: {total_calories(plan, dishes)} ккал")
+    print(f"Суммарная калорийность: {total} ккал")
+    if target > 0:
+        days = len({meal["date"] for meal in plan}) or 1
+        average = total // days
+        print(f"Цель: {target} ккал/день, среднее: {average} ккал/день")
 
-
-MENU = (
-    ("1", "Показать каталог блюд"),
-    ("2", "Найти блюдо по названию"),
-    ("3", "Подобрать блюдо по времени"),
-    ("4", "Добавить блюдо в план"),
-    ("5", "Удалить блюдо из плана"),
-    ("6", "Показать план"),
-    ("7", "Список покупок"),
-    ("8", "Статистика"),
-    ("0", "Выход"),
-)
-
-
-def print_menu() -> None:
-    """Печатает главное меню."""
-    print("\n=== Система планирования питания ===")
-    for key, title in MENU:
-        print(f"{key}. {title}")
-
-
-def main() -> None:
-    """Главный цикл приложения."""
-    dishes = load_dishes()
-    if not dishes:
-        print("Каталог блюд пуст. Проверьте data/dishes.json.")
+def handle_set_name(user: UserProfile) -> None:
+    """Изменяет имя пользователя."""
+    name = input("Новое имя: ").strip()
+    try:
+        set_name(user, name)
+    except ValueError as exc:
+        print(f"Ошибка: {exc}")
         return
+    save_user(user)
+    print("Имя обновлено.")
 
+def handle_set_kcal(user: UserProfile) -> None:
+    """Изменяет целевую калорийность."""
+    target = ask_int("Целевая калорийность (ккал/день): ")
+    if target is None:
+        print("Нужно целое число.")
+        return
+    try:
+        set_target_kcal(user, target)
+    except ValueError as exc:
+        print(f"Ошибка: {exc}")
+        return
+    save_user(user)
+    print("Цель обновлена.")
+
+def handle_set_budget(user: UserProfile) -> None:
+    """Изменяет недельный бюджет."""
+    budget = ask_int("Бюджет на неделю (руб): ")
+    if budget is None:
+        print("Нужно целое число.")
+        return
+    try:
+        set_budget(user, budget)
+    except ValueError as exc:
+        print(f"Ошибка: {exc}")
+        return
+    save_user(user)
+    print("Бюджет обновлён.")
+
+def handle_edit_profile(user: UserProfile) -> None:
+    """Субменю редактирования профиля."""
+    while True:
+        print("\n--- Настройка профиля ---")
+        print("1. Изменить имя")
+        print("2. Изменить цель по калориям")
+        print("3. Изменить бюджет")
+        print("0. Назад")
+        choice = input("Действие: ").strip()
+        if choice == "0":
+            return
+        if choice == "1":
+            handle_set_name(user)
+        elif choice == "2":
+            handle_set_kcal(user)
+        elif choice == "3":
+            handle_set_budget(user)
+        else:
+            print("Неизвестное действие.")
+
+def handle_restrictions(user: UserProfile) -> None:
+    """Субменю управления ограничениями питания."""
+    while True:
+        current = user["restrictions"]
+        print("\n--- Ограничения питания ---")
+        if current:
+            print("Текущие:", ", ".join(current))
+        else:
+            print("Текущие: нет")
+        print("1. Добавить")
+        print("2. Удалить")
+        print("0. Назад")
+        choice = input("Действие: ").strip()
+        if choice == "0":
+            return
+        if choice == "1":
+            name = input("Ингредиент: ").strip()
+            try:
+                added = add_restriction(user, name)
+            except ValueError as exc:
+                print(f"Ошибка: {exc}")
+                continue
+            if added:
+                save_user(user)
+                print("Добавлено.")
+            else:
+                print("Такое ограничение уже есть.")
+        elif choice == "2":
+            name = input("Ингредиент: ").strip()
+            if remove_restriction(user, name):
+                save_user(user)
+                print("Удалено.")
+            else:
+                print("Такого ограничения нет.")
+        else:
+            print("Неизвестное действие.")
+
+def handle_safe_filter(
+    dishes: List[Dict[str, Any]],
+    user: UserProfile,
+) -> None:
+    """Подбор блюд с учётом ограничений питания."""
+    allowed = filter_by_restrictions(dishes, user["restrictions"])
+    if not allowed:
+        print("Нет блюд, удовлетворяющих ограничениям.")
+        return
+    print(f"\nДоступно блюд: {len(allowed)} из {len(dishes)}")
+    for dish in allowed:
+        print(f"  {dish['name']} ({dish['slot']})")
+
+def setup_data() -> Tuple[
+    List[Dict[str, Any]],
+    List[Dict[str, Any]],
+    UserProfile,
+]:
+    """Загружает каталог блюд, план и профиль пользователя."""
+    dishes = load_dishes()
     plan = load_plan()
+    user = load_user()
+    return dishes, plan, user
 
-    actions = {
+def build_actions(
+    dishes: List[Dict[str, Any]],
+    plan: List[Dict[str, Any]],
+    user: UserProfile,
+) -> Dict[str, Callable[[], None]]:
+    """Собирает таблицу обработчиков для пунктов меню."""
+    return {
         "1": lambda: show_dishes(dishes),
         "2": lambda: handle_find(dishes),
         "3": lambda: handle_filter(dishes),
@@ -173,9 +314,21 @@ def main() -> None:
         "5": lambda: handle_remove(plan),
         "6": lambda: show_plan(plan),
         "7": lambda: handle_shopping(dishes, plan),
-        "8": lambda: handle_stats(dishes, plan),
+        "8": lambda: handle_stats(dishes, plan, user),
+        "9": lambda: show_profile(user),
+        "10": lambda: handle_edit_profile(user),
+        "11": lambda: handle_restrictions(user),
+        "12": lambda: handle_safe_filter(dishes, user),
     }
 
+def print_menu() -> None:
+    """Печатает главное меню."""
+    print("\n=== Система планирования питания ===")
+    for key, title in MENU:
+        print(f"{key}. {title}")
+
+def run_loop(actions: Dict[str, Callable[[], None]]) -> None:
+    """Главный цикл: показывает меню и вызывает выбранный обработчик."""
     while True:
         print_menu()
         choice = input("Выберите действие: ").strip()
@@ -188,6 +341,16 @@ def main() -> None:
         else:
             action()
 
+def main() -> None:
+    """Точка входа приложения."""
+    dishes, plan, user = setup_data()
+    if not dishes:
+        print("Каталог блюд пуст. Проверьте data/dishes.json.")
+        return
+
+    print(f"Доступные приёмы пищи: {', '.join(MEAL_SLOTS)}")
+    actions = build_actions(dishes, plan, user)
+    run_loop(actions)
 
 if __name__ == "__main__":
     main()

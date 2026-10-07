@@ -1,0 +1,20 @@
+# pyproject.toml
+[tool.mypy]
+# Укажите вашу версию Python
+python_version = "3.11" 
+
+# Для нового проекта лучше сразу включить строгий режим.
+# Он потребует аннотировать все функции и переменные.
+strict = true 
+
+# Показывать коды ошибок и контекст — полезно для отладки
+show_error_codes = true
+show_error_context = true
+
+# Не ругаться, если у сторонней библиотеки нет типов
+ignore_missing_imports = true
+
+# Для тестов можно сделать послабления (если они появятся)
+[[tool.mypy.overrides]]
+module = "tests.*"
+disallow_untyped_defs = false
