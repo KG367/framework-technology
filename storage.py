@@ -53,9 +53,12 @@ def save_dishes(dishes: List[Dish], path: Path = DISHES_FILE) -> None:
 
 def load_plan(
     dishes: List[Dish],
+    user: UserProfile,
     path: Path = PLAN_FILE,
 ) -> List[Meal]:
-    """Загружает план питания из JSON, связывая приёмы пищи с блюдами."""
+    """Загружает план питания из JSON.
+    Приёмы пищи связываются с блюдами каталога и с указанным пользователем.
+    """
     raw = _read_json(path, [])
     if not isinstance(raw, list):
         return []
@@ -63,7 +66,7 @@ def load_plan(
     for item in raw:
         if not isinstance(item, dict):
             continue
-        meal = Meal.from_data(item, dishes)
+        meal = Meal.from_data(item, dishes, user)
         if meal is not None:
             plan.append(meal)
     return plan

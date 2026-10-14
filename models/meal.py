@@ -3,42 +3,51 @@
 from typing import Any, Dict, List, Optional, Tuple
 
 from .dish import Dish
+from .user import UserProfile
 
 MEAL_SLOTS: Tuple[str, ...] = ("завтрак", "обед", "ужин", "перекус")
 
 
 class Meal:
-    """Приём пищи: дата, слот, блюдо, число порций."""
+    """Приём пищи: дата, слот, блюдо, пользователь, число порций.
+
+    Meal связывает объект Dish и объект UserProfile: приём пищи
+    существует в контексте конкретного пользователя и его плана.
+    """
 
     def __init__(
         self,
         date: str,
         slot: str,
         dish: Dish,
+        user: UserProfile,
         portions: int = 1,
     ) -> None:
-        """Создаёт приём пищи, связывая его с блюдом-объектом."""
+        """Создаёт приём пищи, связывая блюдо и пользователя."""
         self.date: str = date
         self.slot: str = slot
         self.dish: Dish = dish
+        self.user: UserProfile = user
         self.portions: int = portions
 
     def __str__(self) -> str:
         """Возвращает строковое представление приёма пищи."""
         return (
             f"{self.date} | {self.slot} | "
-            f"{self.dish.name} x{self.portions}"
+            f"{self.dish.name} x{self.portions} "
+            f"({self.user.name})"
         )
 
     def to_data(self) -> Dict[str, Any]:
         """Преобразует приём пищи в словарь для JSON.
 
-        Ссылка на блюдо сохраняется как название.
+        Ссылки на блюдо и пользователя сохраняются по имени.
         """
         return {
             "date": self.date,
             "slot": self.slot,
             "dish": self.dish.name,
+            "user": self.user.name,
             "portions": self.portions,
         }
 
@@ -47,8 +56,9 @@ class Meal:
         cls,
         data: Dict[str, Any],
         dishes: List[Dish],
+        user: UserProfile,
     ) -> Optional["Meal"]:
-        """Создаёт приём пищи из JSON, находя связанное блюдо в каталоге.
+        """Создаёт приём пищи из JSON, связывая блюдо и пользователя.
 
         Возвращает None, если блюдо с указанным названием не найдено.
         """
@@ -63,7 +73,7 @@ class Meal:
         date = str(data.get("date", "")).strip()
         slot = str(data.get("slot", "")).strip().lower()
         portions = int(data.get("portions", 1))
-        return cls(date, slot, dish, portions)
+        return cls(date, slot, dish, user, portions)
 
 
 def find_meal(
@@ -83,9 +93,10 @@ def add_meal(
     date: str,
     slot: str,
     dish: Dish,
+    user: UserProfile,
     portions: int = 1,
 ) -> bool:
-    """Добавляет приём пищи в план.
+    """Добавляет приём пищи в план для указанного пользователя.
 
     Возвращает False, если слот на эту дату уже занят.
     Возбуждает ValueError при некорректных аргументах.
@@ -96,7 +107,9 @@ def add_meal(
         raise ValueError("Число порций должно быть >= 1")
     if find_meal(plan, date, slot) is not None:
         return False
-    plan.append(Meal(date=date, slot=slot, dish=dish, portions=portions))
+    plan.append(
+        Meal(date=date, slot=slot, dish=dish, user=user, portions=portions)
+    )
     return True
 
 

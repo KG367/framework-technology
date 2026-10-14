@@ -62,7 +62,8 @@ def show_plan(plan: List[Meal]) -> None:
     for meal in ordered:
         print(
             f"  {format_date(meal.date)} | {meal.slot} | "
-            f"{meal.dish.name} x{meal.portions}"
+            f"{meal.dish.name} x{meal.portions} "
+            f"({meal.user.name})"
         )
 
 
@@ -107,8 +108,12 @@ def handle_filter(dishes: List[Dish]) -> None:
         print(f"  {dish}")
 
 
-def handle_add(dishes: List[Dish], plan: List[Meal]) -> None:
-    """Добавляет блюдо в план питания."""
+def handle_add(
+    dishes: List[Dish],
+    plan: List[Meal],
+    user: UserProfile,
+) -> None:
+    """Добавляет блюдо в план питания пользователя."""
     iso_date = parse_date(input("Дата (ДД.ММ.ГГГГ): "))
     if iso_date is None:
         print("Неверный формат даты.")
@@ -124,7 +129,7 @@ def handle_add(dishes: List[Dish], plan: List[Meal]) -> None:
         print("Нужно целое число >= 1.")
         return
     try:
-        added = add_meal(plan, iso_date, slot, dish, portions)
+        added = add_meal(plan, iso_date, slot, dish, user, portions)
     except ValueError as exc:
         print(f"Ошибка: {exc}")
         return
@@ -287,10 +292,11 @@ def handle_safe_filter(dishes: List[Dish], user: UserProfile) -> None:
 
 
 def setup_data() -> Tuple[List[Dish], List[Meal], UserProfile]:
-    """Загружает каталог блюд, план и профиль пользователя."""
-    dishes = load_dishes()
-    plan = load_plan(dishes)
+    """Загружает каталог блюд, профиль и план пользователя.
+    """
     user = load_user()
+    dishes = load_dishes()
+    plan = load_plan(dishes, user)
     return dishes, plan, user
 
 
@@ -304,7 +310,7 @@ def build_actions(
         "1": lambda: show_dishes(dishes),
         "2": lambda: handle_find(dishes),
         "3": lambda: handle_filter(dishes),
-        "4": lambda: handle_add(dishes, plan),
+        "4": lambda: handle_add(dishes, plan, user),
         "5": lambda: handle_remove(plan),
         "6": lambda: show_plan(plan),
         "7": lambda: handle_shopping(plan),

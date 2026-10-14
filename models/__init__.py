@@ -1,7 +1,8 @@
 """Пакет объектной модели предметной области.
 
-Экспортирует классы Ingredient, Dish, Meal, UserProfile и функции
-обработки коллекций этих объектов.
+Экспортирует классы Ingredient, Dish, UserProfile, Meal и функции
+обработки коллекций этих объектов. Порядок импортов соответствует
+графу зависимостей: ingredient -> dish -> user -> meal.
 """
 
 from .dish import Dish, filter_dishes, find_by_name
