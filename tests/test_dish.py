@@ -4,10 +4,17 @@ from typing import List, Optional
 
 import pytest
 
-from models import Dish, Ingredient, filter_dishes, find_by_name
+from models import (
+    Dish,
+    Ingredient,
+    filter_dishes,
+    find_by_name,
+    find_dish_by_id,
+)
 
 
 def make_dish(
+    dish_id: int,
     name: str,
     slot: str,
     minutes: int,
@@ -15,6 +22,7 @@ def make_dish(
 ) -> Dish:
     """Создаёт тестовое блюдо без ингредиентов."""
     return Dish(
+        dish_id=dish_id,
         name=name,
         slot=slot,
         minutes=minutes,
@@ -27,16 +35,17 @@ def make_dish(
 def dishes() -> List[Dish]:
     """Каталог тестовых блюд."""
     return [
-        make_dish("Омлет", "завтрак", 10, 320),
-        make_dish("Суп", "обед", 60, 350),
-        make_dish("Салат", "ужин", 15, 200),
+        make_dish(1, "Омлет", "завтрак", 10, 320),
+        make_dish(2, "Суп", "обед", 60, 350),
+        make_dish(3, "Салат", "ужин", 15, 200),
     ]
 
 
 def test_dish_creation() -> None:
     """Создание блюда с ингредиентами."""
     ingredient = Ingredient("яйца", "3 шт")
-    dish = Dish("Омлет", "завтрак", 10, 320, [ingredient])
+    dish = Dish(1, "Омлет", "завтрак", 10, 320, [ingredient])
+    assert dish.dish_id == 1
     assert dish.name == "Омлет"
     assert dish.slot == "завтрак"
     assert dish.minutes == 10
@@ -46,7 +55,7 @@ def test_dish_creation() -> None:
 
 def test_dish_str() -> None:
     """Строковое представление блюда."""
-    dish = make_dish("Омлет", "завтрак", 10, 320)
+    dish = make_dish(1, "Омлет", "завтрак", 10, 320)
     assert str(dish) == "Омлет | завтрак | 10 мин | 320 ккал"
 
 
@@ -58,13 +67,17 @@ def test_ingredient_str() -> None:
 
 def test_dish_is_allowed_without_restrictions() -> None:
     """Без ограничений любое блюдо разрешено."""
-    dish = Dish("Омлет", "завтрак", 10, 320, [Ingredient("яйца", "3 шт")])
+    dish = Dish(
+        1, "Омлет", "завтрак", 10, 320,
+        [Ingredient("яйца", "3 шт")],
+    )
     assert dish.is_allowed([])
 
 
 def test_dish_is_allowed_blocked() -> None:
     """Блюдо с запрещённым ингредиентом не пропускается."""
     dish = Dish(
+        1,
         "Паста",
         "обед",
         20,
@@ -77,6 +90,7 @@ def test_dish_is_allowed_blocked() -> None:
 def test_dish_from_data_roundtrip() -> None:
     """Создание блюда из словаря и обратное преобразование."""
     data = {
+        "id": 1,
         "name": "Омлет",
         "slot": "завтрак",
         "minutes": 10,
@@ -84,6 +98,7 @@ def test_dish_from_data_roundtrip() -> None:
         "ingredients": [{"name": "яйца", "amount": "3 шт"}],
     }
     dish = Dish.from_data(data)
+    assert dish.dish_id == 1
     assert dish.name == "Омлет"
     assert dish.ingredients[0].name == "яйца"
     assert dish.to_data() == data
@@ -104,6 +119,18 @@ def test_find_by_name_not_found(dishes: List[Dish]) -> None:
 def test_find_by_name_empty_query(dishes: List[Dish]) -> None:
     """Пустой запрос возвращает None."""
     assert find_by_name(dishes, "") is None
+
+
+def test_find_dish_by_id_found(dishes: List[Dish]) -> None:
+    """Поиск блюда по существующему id."""
+    dish = find_dish_by_id(dishes, 2)
+    assert dish is not None
+    assert dish.name == "Суп"
+
+
+def test_find_dish_by_id_not_found(dishes: List[Dish]) -> None:
+    """Поиск блюда по отсутствующему id даёт None."""
+    assert find_dish_by_id(dishes, 999) is None
 
 
 def test_filter_by_slot(dishes: List[Dish]) -> None:

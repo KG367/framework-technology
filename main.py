@@ -93,9 +93,7 @@ def handle_find(dishes: List[Dish]) -> None:
 
 def handle_filter(dishes: List[Dish]) -> None:
     """Обрабатывает подбор блюд по слоту и времени."""
-    slot = input(
-        "Приём пищи (завтрак/обед/ужин/перекус): "
-    ).strip().lower()
+    slot = input("Приём пищи (завтрак/обед/ужин/перекус): ").strip().lower()
     minutes = ask_int("Максимум минут: ")
     if minutes is None:
         print("Нужно целое число.")
@@ -174,10 +172,7 @@ def handle_stats(plan: List[Meal], user: UserProfile) -> None:
     if user.target_kcal > 0 and plan:
         days = len({meal.date for meal in plan}) or 1
         average = total // days
-        print(
-            f"Цель: {user.target_kcal} ккал/день, "
-            f"среднее: {average} ккал/день"
-        )
+        print(f"Цель: {user.target_kcal} ккал/день, " f"среднее: {average} ккал/день")
 
 
 def handle_set_name(user: UserProfile) -> None:
@@ -292,8 +287,7 @@ def handle_safe_filter(dishes: List[Dish], user: UserProfile) -> None:
 
 
 def setup_data() -> Tuple[List[Dish], List[Meal], UserProfile]:
-    """Загружает каталог блюд, профиль и план пользователя.
-    """
+    """Загружает каталог блюд, профиль и план пользователя."""
     user = load_user()
     dishes = load_dishes()
     plan = load_plan(dishes, user)

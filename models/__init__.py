@@ -5,7 +5,7 @@
 графу зависимостей: ingredient -> dish -> user -> meal.
 """
 
-from .dish import Dish, filter_dishes, find_by_name
+from .dish import Dish, filter_dishes, find_by_name, find_dish_by_id
 from .ingredient import Ingredient
 from .meal import (
     MEAL_SLOTS,
@@ -13,6 +13,7 @@ from .meal import (
     add_meal,
     build_shopping_list,
     find_meal,
+    find_meal_by_id,
     remove_meal,
     total_calories,
 )
@@ -30,7 +31,9 @@ __all__ = [
     "build_shopping_list",
     "filter_dishes",
     "find_by_name",
+    "find_dish_by_id",
     "find_meal",
+    "find_meal_by_id",
     "remove_meal",
     "total_calories",
 ]

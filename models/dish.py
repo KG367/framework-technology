@@ -6,10 +6,11 @@ from .ingredient import Ingredient
 
 
 class Dish:
-    """Блюдо: название, приём пищи, время готовки, калорийность, состав."""
+    """Блюдо: идентификатор, название, приём пищи, состав."""
 
     def __init__(
         self,
+        dish_id: int,
         name: str,
         slot: str,
         minutes: int,
@@ -17,6 +18,7 @@ class Dish:
         ingredients: List[Ingredient],
     ) -> None:
         """Создаёт блюдо с указанными характеристиками."""
+        self.dish_id: int = dish_id
         self.name: str = name.strip()
         self.slot: str = slot.strip().lower()
         self.minutes: int = minutes
@@ -43,6 +45,7 @@ class Dish:
     @classmethod
     def from_data(cls, data: Dict[str, Any]) -> "Dish":
         """Создаёт блюдо из словаря (например, из JSON)."""
+        dish_id = int(data.get("id", 0))
         name = str(data.get("name", "")).strip()
         slot = str(data.get("slot", "")).strip().lower()
         minutes = int(data.get("minutes", 0))
@@ -53,11 +56,12 @@ class Dish:
             for item in raw_ingredients:
                 if isinstance(item, dict):
                     ingredients.append(Ingredient.from_data(item))
-        return cls(name, slot, minutes, kcal, ingredients)
+        return cls(dish_id, name, slot, minutes, kcal, ingredients)
 
     def to_data(self) -> Dict[str, Any]:
         """Преобразует блюдо в словарь для сохранения в JSON."""
         return {
+            "id": self.dish_id,
             "name": self.name,
             "slot": self.slot,
             "minutes": self.minutes,
@@ -75,6 +79,17 @@ def find_by_name(dishes: List[Dish], name: str) -> Optional[Dish]:
         return None
     for dish in dishes:
         if query in dish.name.lower():
+            return dish
+    return None
+
+
+def find_dish_by_id(
+    dishes: List[Dish],
+    dish_id: int,
+) -> Optional[Dish]:
+    """Ищет блюдо по идентификатору."""
+    for dish in dishes:
+        if dish.dish_id == dish_id:
             return dish
     return None
 

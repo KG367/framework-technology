@@ -159,8 +159,7 @@ def test_load_user_broken_types(tmp_path: Path) -> None:
     """Повреждённые значения заменяются значениями по умолчанию."""
     path = tmp_path / "user.json"
     path.write_text(
-        '{"name": 42, "target_kcal": "abc", '
-        '"budget": -10, "restrictions": "нет"}',
+        '{"name": 42, "target_kcal": "abc", ' '"budget": -10, "restrictions": "нет"}',
         encoding="utf-8",
     )
     user = load_user(path)

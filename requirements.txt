@@ -4,3 +4,4 @@
 flake8==7.1.0
 pytest==8.3.3
 mypy==1.13.0
+Django==5.2.*

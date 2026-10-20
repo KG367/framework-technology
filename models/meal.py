@@ -9,7 +9,7 @@ MEAL_SLOTS: Tuple[str, ...] = ("завтрак", "обед", "ужин", "пер
 
 
 class Meal:
-    """Приём пищи: дата, слот, блюдо, пользователь, число порций.
+    """Приём пищи: идентификатор, дата, слот, блюдо, пользователь.
 
     Meal связывает объект Dish и объект UserProfile: приём пищи
     существует в контексте конкретного пользователя и его плана.
@@ -17,6 +17,7 @@ class Meal:
 
     def __init__(
         self,
+        meal_id: int,
         date: str,
         slot: str,
         dish: Dish,
@@ -24,6 +25,7 @@ class Meal:
         portions: int = 1,
     ) -> None:
         """Создаёт приём пищи, связывая блюдо и пользователя."""
+        self.meal_id: int = meal_id
         self.date: str = date
         self.slot: str = slot
         self.dish: Dish = dish
@@ -44,6 +46,7 @@ class Meal:
         Ссылки на блюдо и пользователя сохраняются по имени.
         """
         return {
+            "id": self.meal_id,
             "date": self.date,
             "slot": self.slot,
             "dish": self.dish.name,
@@ -62,6 +65,7 @@ class Meal:
 
         Возвращает None, если блюдо с указанным названием не найдено.
         """
+        meal_id = int(data.get("id", 0))
         name = str(data.get("dish", "")).strip()
         dish: Optional[Dish] = None
         for candidate in dishes:
@@ -73,7 +77,7 @@ class Meal:
         date = str(data.get("date", "")).strip()
         slot = str(data.get("slot", "")).strip().lower()
         portions = int(data.get("portions", 1))
-        return cls(date, slot, dish, user, portions)
+        return cls(meal_id, date, slot, dish, user, portions)
 
 
 def find_meal(
@@ -88,6 +92,24 @@ def find_meal(
     return None
 
 
+def find_meal_by_id(
+    plan: List[Meal],
+    meal_id: int,
+) -> Optional[Meal]:
+    """Находит приём пищи по идентификатору."""
+    for meal in plan:
+        if meal.meal_id == meal_id:
+            return meal
+    return None
+
+
+def next_meal_id(plan: List[Meal]) -> int:
+    """Возвращает следующий свободный идентификатор приёма пищи."""
+    if not plan:
+        return 1
+    return max(meal.meal_id for meal in plan) + 1
+
+
 def add_meal(
     plan: List[Meal],
     date: str,
@@ -98,6 +120,7 @@ def add_meal(
 ) -> bool:
     """Добавляет приём пищи в план для указанного пользователя.
 
+    Идентификатор приёма пищи генерируется автоматически.
     Возвращает False, если слот на эту дату уже занят.
     Возбуждает ValueError при некорректных аргументах.
     """
@@ -107,8 +130,9 @@ def add_meal(
         raise ValueError("Число порций должно быть >= 1")
     if find_meal(plan, date, slot) is not None:
         return False
+    meal_id = next_meal_id(plan)
     plan.append(
-        Meal(date=date, slot=slot, dish=dish, user=user, portions=portions)
+        Meal(meal_id, date, slot, dish, user, portions)
     )
     return True
 
