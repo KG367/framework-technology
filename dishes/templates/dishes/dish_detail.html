@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block title %}
+    {% if dish %}{{ dish.name }}{% else %}Блюдо не найдено{% endif %} - MealPlanner
+{% endblock %}
+
+{% block content %}
+{% if dish %}
+    <div class="card dish-detail-card mb-3">
+        <div class="card-body">
+            <h1 class="card-title">{{ dish.name }}</h1>
+            <p class="card-text"><strong>Приём пищи:</strong> {{ dish.slot }}</p>
+            <p class="card-text"><strong>Время готовки:</strong> {{ dish.minutes }} мин</p>
+            <p class="card-text"><strong>Калорийность:</strong> {{ dish.kcal }} ккал</p>
+            <hr>
+            <h5 class="card-title">Ингредиенты</h5>
+            <ul>
+                {% for ingredient in dish.ingredients %}
+                    <li>{{ ingredient.name }}: {{ ingredient.amount }}</li>
+                {% empty %}
+                    <li>Нет данных об ингредиентах</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+{% else %}
+    <div class="alert alert-danger">
+        <h1 class="display-5">Блюдо не найдено</h1>
+        <p>Блюдо с указанным идентификатором отсутствует.</p>
+    </div>
+{% endif %}
+
+<a href="{% url 'dishes:list' %}" class="btn btn-outline-secondary mt-3">
+    ← к каталогу блюд
+</a>
+{% endblock %}

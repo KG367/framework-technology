@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block title %}Главная - MealPlanner{% endblock %}
+
+{% block content %}
+<div class="p-5 mb-4 bg-light rounded-3">
+    <div class="container-fluid py-5">
+        <h1 class="display-5 fw-bold">MealPlanner</h1>
+        <p class="col-md-8 fs-4">Система планирования приготовления блюд.</p>
+        <hr>
+        <p>Основные разделы:</p>
+        <a href="{% url 'dishes:list' %}" class="btn btn-primary btn-lg me-2">Каталог блюд</a>
+        <a href="{% url 'planner:list' %}" class="btn btn-secondary btn-lg">План питания</a>
+    </div>
+</div>
+{% endblock %}

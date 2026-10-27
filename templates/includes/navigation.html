@@ -1,0 +1,16 @@
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container">
+        <a class="navbar-brand" href="{% url 'homepage:index' %}">MealPlanner</a>
+        <ul class="navbar-nav me-auto">
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'dishes:list' %}">Каталог блюд</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'planner:list' %}">План питания</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'homepage:profile' %}">Профиль</a>
+            </li>
+        </ul>
+    </div>
+</nav>

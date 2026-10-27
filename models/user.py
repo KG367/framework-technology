@@ -22,7 +22,9 @@ class UserProfile:
         self.name: str = name
         self.target_kcal: int = target_kcal
         self.budget: int = budget
-        self.restrictions: List[str] = list(restrictions) if restrictions else []
+        self.restrictions: List[str] = (
+            list(restrictions) if restrictions else []
+        )
 
     def __str__(self) -> str:
         """Возвращает строковое представление профиля."""
@@ -48,7 +50,8 @@ class UserProfile:
         """
         if not KCAL_MIN <= target <= KCAL_MAX:
             raise ValueError(
-                "Целевая калорийность должна быть в диапазоне " f"{KCAL_MIN}–{KCAL_MAX}"
+                "Целевая калорийность должна быть в диапазоне "
+                f"{KCAL_MIN}–{KCAL_MAX}"
             )
         self.target_kcal = target
 

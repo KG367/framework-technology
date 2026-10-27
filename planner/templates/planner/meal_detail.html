@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block title %}
+    {% if meal %}Приём пищи №{{ meal.meal_id }}{% else %}Приём пищи не найден{% endif %} - MealPlanner
+{% endblock %}
+
+{% block content %}
+{% if meal %}
+    <div class="card meal-detail-card mb-3">
+        <div class="card-body">
+            <h1 class="card-title">Приём пищи №{{ meal.meal_id }}</h1>
+            <p class="card-text"><strong>Дата:</strong> {{ meal.date }}</p>
+            <p class="card-text"><strong>Приём:</strong> {{ meal.slot }}</p>
+            <p class="card-text"><strong>Блюдо:</strong> {{ meal.dish.name }}</p>
+            <p class="card-text"><strong>Порций:</strong> {{ meal.portions }}</p>
+            <p class="card-text"><strong>Пользователь:</strong> {{ meal.user.name }}</p>
+            <p class="card-text">
+                <strong>Статус:</strong>
+                {% include "planner/includes/meal_status.html" %}
+            </p>
+            <hr>
+            <h5 class="card-title">Ингредиенты блюда</h5>
+            <ul>
+                {% for ingredient in meal.dish.ingredients %}
+                    <li>{{ ingredient.name }}: {{ ingredient.amount }}</li>
+                {% empty %}
+                    <li>Нет данных об ингредиентах</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+{% else %}
+    <div class="alert alert-danger">
+        <h1 class="display-5">Приём пищи не найден</h1>
+        <p>Приём пищи с указанным идентификатором отсутствует.</p>
+    </div>
+{% endif %}
+
+<a href="{% url 'planner:list' %}" class="btn btn-outline-secondary mt-3">
+    ← к плану питания
+</a>
+{% endblock %}

@@ -4,7 +4,7 @@ import os
 import sys
 
 
-def main()->None:
+def main() -> None:
     """Run administrative tasks."""
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "mealplanner.settings")
     try:

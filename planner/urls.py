@@ -4,7 +4,9 @@ from django.urls import path
 
 from . import views
 
+app_name = "planner"
+
 urlpatterns = [
-    path("", views.plan_list, name="plan_list"),
-    path("<int:meal_id>/", views.meal_detail, name="meal_detail"),
+    path("", views.plan_list, name="list"),
+    path("<int:meal_id>/", views.meal_detail, name="detail"),
 ]

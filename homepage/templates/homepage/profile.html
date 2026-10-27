@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %}Профиль - MealPlanner{% endblock %}
+
+{% block content %}
+<h1>Профиль пользователя</h1>
+<ul class="list-group mt-3">
+    <li class="list-group-item">
+        <strong>Имя:</strong> {{ user.name|default:"Без имени" }}
+    </li>
+    <li class="list-group-item">
+        <strong>Цель по калориям:</strong> {{ user.target_kcal }} ккал/день
+    </li>
+    <li class="list-group-item">
+        <strong>Бюджет:</strong> {{ user.budget }} руб/неделя
+    </li>
+    <li class="list-group-item">
+        <strong>Ограничения:</strong>
+        {% for restriction in user.restrictions %}
+            <span class="badge bg-warning text-dark me-1">{{ restriction }}</span>
+        {% empty %}
+            <span class="text-muted">нет</span>
+        {% endfor %}
+    </li>
+</ul>
+{% endblock %}

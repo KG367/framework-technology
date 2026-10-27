@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block title %}Каталог блюд - MealPlanner{% endblock %}
+
+{% block content %}
+<h1>Каталог блюд</h1>
+<p>Всего блюд: {{ dishes|length }}</p>
+
+<ul class="list-group mt-3">
+    {% for dish in dishes %}
+        {% include "dishes/includes/dish_card.html" %}
+    {% empty %}
+        <li class="list-group-item">Блюда не найдены.</li>
+    {% endfor %}
+</ul>
+{% endblock %}

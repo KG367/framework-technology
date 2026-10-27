@@ -172,7 +172,10 @@ def handle_stats(plan: List[Meal], user: UserProfile) -> None:
     if user.target_kcal > 0 and plan:
         days = len({meal.date for meal in plan}) or 1
         average = total // days
-        print(f"Цель: {user.target_kcal} ккал/день, " f"среднее: {average} ккал/день")
+        print(
+            f"Цель: {user.target_kcal} ккал/день, "
+            f"среднее: {average} ккал/день"
+        )
 
 
 def handle_set_name(user: UserProfile) -> None:

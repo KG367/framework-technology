@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block title %}План питания - MealPlanner{% endblock %}
+
+{% block content %}
+<h1>План питания</h1>
+<p>Всего приёмов пищи: {{ plan|length }}</p>
+
+<ul class="list-group mt-3">
+    {% for meal in plan %}
+        {% include "planner/includes/meal_card.html" %}
+    {% empty %}
+        <li class="list-group-item">План пуст. Добавьте блюда через консольную версию или отредактируйте data/plan.json.</li>
+    {% endfor %}
+</ul>
+{% endblock %}

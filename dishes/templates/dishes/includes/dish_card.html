@@ -1,0 +1,11 @@
+<li class="list-group-item dish-card d-flex justify-content-between align-items-center">
+    <div>
+        <strong>{{ dish.name|default:"Без названия" }}</strong>
+        <span class="badge bg-info text-dark ms-2">{{ dish.slot }}</span>
+        <span class="badge bg-secondary ms-1">{{ dish.minutes }} мин</span>
+        <span class="badge bg-primary ms-1">{{ dish.kcal }} ккал</span>
+    </div>
+    <a href="{% url 'dishes:detail' dish.dish_id %}" class="btn btn-sm btn-outline-primary">
+        Подробнее
+    </a>
+</li>

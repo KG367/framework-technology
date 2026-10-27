@@ -1,0 +1,25 @@
+/* Собственные стили проекта MealPlanner */
+body {
+    background-color: #f8f9fa;
+}
+
+.navbar-brand {
+    font-weight: bold;
+    letter-spacing: 1px;
+}
+
+.dish-card, .meal-card {
+    transition: background-color 0.2s;
+}
+
+.dish-card:hover, .meal-card:hover {
+    background-color: #e9ecef;
+}
+
+.dish-detail-card, .meal-detail-card {
+    border-left: 5px solid #4d6bfe;
+}
+
+.meal-status-active {
+    background-color: #198754 !important;
+}
